@@ -26,7 +26,7 @@
 # SOFTWARE.
 
 
-class Base(object):
+class BaseScenario(object):
     """ Base scenario class. Simplifies writing of the scenarios and provides
         the game state to every scenario.
     """

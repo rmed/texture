@@ -55,3 +55,36 @@ def tprint(text, dedent=True):
 
     else:
         print(text)
+
+def printer(func=None, **options):
+    """ Decorator used to print whatever text is returned in the caller function.
+
+        When a list or a tuple are returned, then the contents are iterated and
+        printed.
+
+        Options:
+
+            dedent - whether or not to dedent the text (default: True)
+    """
+    if func:
+        def decorator():
+            ret = func()
+            do_dedent = options.get('dedent', True)
+
+            if type(ret) is tuple or type(ret) is list:
+                # Iterate and print all
+                for text in ret:
+                    tprint(text, do_dedent)
+
+            else:
+                # Print single text/var
+                tprint(ret, do_dedent)
+
+        return decorator
+
+    # Function was not received
+    def partial(func):
+        return printer(func, **options)
+
+    return partial
+
