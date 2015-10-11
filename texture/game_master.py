@@ -25,14 +25,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from  . import util
 import pkgutil
 import readline
 import sys
 
 if sys.version[0] == '3': raw_input=input
 
-
-#TODO: substitute print() with version from .util
 
 class GameMaster(object):
 
@@ -56,11 +55,11 @@ class GameMaster(object):
                 self.scenarios[modname] = mod.Scenario
 
             except ImportError:
-                print('Failed to import' + modname)
+                util.tprint('Failed to import' + modname)
                 continue
 
             except AttributeError:
-                print('Module "%s" is not a scenario' % modname)
+                util.tprint('Module "%s" is not a scenario' % modname)
                 continue
 
         def start_game(self):
@@ -96,7 +95,7 @@ class GameMaster(object):
             scenario = self.scenarios.get(name, None)
 
             if not scenario:
-                print('[ERROR] Scenario "%s" not found' % name)
+                util.tprint('[ERROR] Scenario "%s" not found' % name)
                 return
 
             self.current = scenario(self.state)
@@ -111,7 +110,7 @@ class GameMaster(object):
             if not func:
                 return None
 
-            return func()
+            return func(self.state)
 
         def _main_loop(self):
             """ Main game loop. """
@@ -122,7 +121,7 @@ class GameMaster(object):
             while True:
 
                 # Ask for input
-                print('\n')
+                util.tnewline()
                 cmd = raw_input('> ')
 
                 # Preset game commands
