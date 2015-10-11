@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Texture game engine
+# texture game engine
 # https://github.com/rmed/texture
 #
 # The MIT License (MIT)
