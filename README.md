@@ -3,6 +3,8 @@
 > (...) I rejected those answers. Instead, I chose something different. I chose
 > the (im)possible. I chose... texture
 
+[![PyPI version](https://img.shields.io/pypi/v/texture.svg)](https://pypi.python.org/pypi/texture)
+
 texture is a micro-engine for creating text-based adventures.
 
 ## Features

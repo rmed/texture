@@ -4,6 +4,8 @@ texture
     (...) I rejected those answers. Instead, I chose something
     different. I chose the (im)possible. I chose... texture
 
+|PyPI version|
+
 texture is a micro-engine for creating text-based adventures.
 
 Features
@@ -19,3 +21,6 @@ Want your game to calculate x digits of *pi*? Well, go for it!
 
 Documentation coming soon
 -------------------------
+
+.. |PyPI version| image:: https://img.shields.io/pypi/v/texture.svg
+   :target: https://pypi.python.org/pypi/texture
