@@ -48,7 +48,8 @@ class GameMaster(object):
         # Import scenarios
         self.scenarios = {}
 
-        for _, modname, _ in pkgutil.iter_modules(scenarios.__path__):
+        pkg = sys.modules[scenarios]
+        for _, modname, _ in pkgutil.iter_modules(pkg.__path__):
             try:
                 mod = __import__('%s.%s' % (scenarios, modname),
                     fromlist=['Scenario'])
@@ -62,81 +63,86 @@ class GameMaster(object):
                 util.tprint('Module "%s" is not a scenario' % modname)
                 continue
 
-        def start_game(self):
-            """ Call the main loop. """
-            self._main_loop()
+    def start_game(self):
+        """ Call the main loop. """
+        self._main_loop()
 
-        def register_command(self, cmd, func):
-            """ Register a game command.
+    def register_command(self, cmd, func):
+        """ Register a game command.
 
-                These commands are parsed before the scenario actions and may be
-                used to perform special action such as restarting the game or
-                loading a special scenario.
+            These commands are parsed before the scenario actions and may be
+            used to perform special action such as restarting the game or
+            loading a special scenario.
 
-                These commands may return special strings to perform actions
-                in the game loop:
+            These commands may return special strings to perform actions
+            in the game loop:
 
-                    continue - next "game tick"
-                    load X   - load another scenario
+                continue - next "game tick"
+                load X   - load another scenario
 
-                cmd  - command to match
-                func - function to execute
-            """
-            self.game_commands[cmd] = func
+            cmd  - command to match
+            func - function to execute
+        """
+        self.game_commands[cmd] = func
 
-        def _change_scenario(self, name):
-            """ Change scenario and call the scenario `load()` method.
+    def _change_scenario(self, name):
+        """ Change scenario and call the scenario `load()` method.
 
-                Substitutes the `self.current` reference to point to the new
-                scenario.
+            Substitutes the `self.current` reference to point to the new
+            scenario.
 
-                name - name of the scenario in the scenarios map
-            """
-            scenario = self.scenarios.get(name, None)
+            name - name of the scenario in the scenarios map
+        """
+        # Update state
+        if self.current:
+            self.state = self.current.state
 
-            if not scenario:
-                util.tprint('[ERROR] Scenario "%s" not found' % name)
-                return
+        scenario = self.scenarios.get(name, None)
 
-            self.current = scenario(self.state)
-            self.current.load()
+        if not scenario:
+            util.tprint('[ERROR] Scenario "%s" not found' % name)
+            return
 
-        def _exec_game_command(self, cmd):
-            """ Try to match user input to a game command and execute its
-                function if found.
-            """
-            func = self.game_commands.get(cmd, None)
+        self.current = scenario(self.state)
+        self.current.load()
 
-            if not func:
-                return None
+    def _exec_game_command(self, cmd):
+        """ Try to match user input to a game command and execute its
+            function if found.
+        """
+        func = self.game_commands.get(cmd, None)
 
-            return func(self.state)
+        if not func:
+            return None
 
-        def _main_loop(self):
-            """ Main game loop. """
-            # First scenario is 'start'
-            sc_name = 'start'
-            self._change_scenario(sc_name)
+        return func(self.state)
 
-            while True:
+    def _main_loop(self):
+        """ Main game loop. """
+        # First scenario is 'start'
+        sc_name = 'start'
+        self._change_scenario(sc_name)
 
-                # Ask for input
-                util.tnewline()
-                cmd = raw_input('> ')
+        while True:
 
-                # Preset game commands
-                response = self._exec_game_command(cmd)
+            # Ask for input
+            util.tnewline()
+            cmd = raw_input('> ')
+            util.tnewline()
 
-                if not response:
-                    # Perform scenario action
-                    response = self.current.do_action(cmd)
+            # Preset game commands
+            response = self._exec_game_command(cmd)
 
-                # Parse response
-                if type(response) is str:
-                    # Game loop commands
-                    if response.startswith('load'):
-                        name = response.split('load')[1].strip()
-                        self._change_scenario(name)
+            if not response:
+                # Perform scenario action
+                response = self.current.do_action(cmd)
 
-                    if response == 'continue':
-                        continue
+            # Parse response
+            if type(response) is str:
+                # Game loop commands
+                if response.startswith('load'):
+                    sc_name = response.split('load')[1].strip()
+                    self._change_scenario(sc_name)
+
+                elif response == 'continue':
+                    continue

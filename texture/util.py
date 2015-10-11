@@ -67,9 +67,13 @@ def printer(func=None, **options):
             dedent - whether or not to dedent the text (default: True)
     """
     if func:
-        def decorator():
-            ret = func()
+        def decorator(*args, **kwargs):
+            ret = func(*args, **kwargs)
             do_dedent = options.get('dedent', True)
+
+            if not ret:
+                # Nothing to print
+                return
 
             if type(ret) is tuple or type(ret) is list:
                 # Iterate and print all
@@ -87,4 +91,3 @@ def printer(func=None, **options):
         return printer(func, **options)
 
     return partial
-
