@@ -26,20 +26,31 @@
 # SOFTWARE.
 
 from  . import util
+from six.moves import input
 import pkgutil
 import readline
+import six
 import sys
-
-if sys.version[0] == '3': raw_input=input
 
 
 class GameMaster(object):
+    """
+        Attributes:
+
+            current         - current Scenario instance
+            game_commands   - dict that contains special commands,
+                which are parsed before those of the curent Scenario,
+                and the functions they execute
+            state           - global game state shared and updated on each
+                Scenario load
+            scenarios       - map of scenarios
+    """
 
     def __init__(self, scenarios='scenarios'):
         """ Object that implements the main game loop and the command input.
 
-            scenarios - module that contains the scenarios. These scenarios
-                are imported at startup recursively.
+            scenarios   - name of the module that contains the scenarios.
+                These scenarios are imported at startup automatically.
         """
         self.current = None
         self.game_commands = {}
@@ -124,10 +135,9 @@ class GameMaster(object):
         self._change_scenario(sc_name)
 
         while True:
-
             # Ask for input
             util.tnewline()
-            cmd = raw_input('> ')
+            cmd = input('> ')
             util.tnewline()
 
             # Preset game commands
@@ -138,11 +148,18 @@ class GameMaster(object):
                 response = self.current.do_action(cmd)
 
             # Parse response
-            if type(response) is str:
+            if isinstance(response, util.TickUtil):
+                continue
+
+            elif isinstance(response, util.LoaderUtil):
+                sc_name = response.scenario
+                self._change_scenario(sc_name)
+
+            elif isinstance(response, six.text_type):
                 # Game loop commands
-                if response.startswith('load'):
+                if response == 'continue':
+                    continue
+
+                elif response.startswith('load'):
                     sc_name = response.split('load')[1].strip()
                     self._change_scenario(sc_name)
-
-                elif response == 'continue':
-                    continue

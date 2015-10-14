@@ -25,24 +25,62 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-from __future__ import print_function
-import sys
+from six.moves import range
+import six
 import textwrap
 
-if sys.version[0] == '3': xrange=range
+
+class LoaderUtil(object):
+    """ Class used to simplify returning scenario load orders and play nice
+        with the `@printer` decorator.
+
+        Generally, this class should not be accessed directly. Instead, use the
+        `loader` object defined below. Usage:
+
+            return loader('my_new_scenario')
+    """
+
+    def __init__(self):
+        self.scenario = ''
+
+    def __call__(self, scenario):
+        """ Update the object's scenario to load. """
+        if not isinstance(scenario, six.text_type):
+            raise TypeError('scenario name should be a string')
+
+        self.scenario = scenario
+
+
+class TickUtil(object):
+    """ Dummy class for the `dotick` object used to inform the main loop that it
+        should continue with the next "tick". As with `LoaderUtil`, this should
+        play nice with the `@printer` decorator. Usage:
+
+            return dotick
+    """
+
+    def __init__(self):
+        pass
+
+
+# May be used to inform the main loop of the scenario change
+loader = LoaderUtil()
+
+# May be used to inform the main loop that it should continue with next tick
+dotick = TickUtil()
 
 
 def tclear():
     """ Clear the screen. """
-    print(chr(27) + '[2J')
+    six.print_(chr(27) + '[2J')
 
 def tnewline(times=1):
     """ Print the newline character.
 
         times - number of times to print the character
     """
-    for _ in xrange(0, times):
-        print('\n')
+    for _ in range(0, times):
+        six.print_('\n')
 
 def tprint(text, dedent=True):
     """ Print text on screen.
@@ -51,16 +89,17 @@ def tprint(text, dedent=True):
         dedent  - whether or not to dedent the text
     """
     if dedent:
-        print(textwrap.dedent(text))
+        six.print_(textwrap.dedent(text))
 
     else:
-        print(text)
+        six.print_(text)
 
 def printer(func=None, **options):
-    """ Decorator used to print whatever text is returned in the caller function.
+    """ Decorator used to print whatever text is returned in the caller
+        function.
 
-        When a list or a tuple are returned, then the contents are iterated and
-        printed.
+        When a list or a tuple are returned, then the contents are iterated
+        and printed.
 
         Options:
 
@@ -75,14 +114,15 @@ def printer(func=None, **options):
                 # Nothing to print
                 return
 
-            if type(ret) is tuple or type(ret) is list:
+            if isinstance(ret, six.text_type):
+                # Print single text/var
+                tprint(ret, do_dedent)
+
+            elif isinstance(ret, tuple) or isinstance(ret, list):
                 # Iterate and print all
                 for text in ret:
                     tprint(text, do_dedent)
 
-            else:
-                # Print single text/var
-                tprint(ret, do_dedent)
 
         return decorator
 

@@ -27,4 +27,4 @@
 
 from .game_master import GameMaster
 from .scenario import BaseScenario
-from .util import tclear, tnewline, tprint, printer
+from .util import loader, dotick, tclear, tnewline, tprint, printer
