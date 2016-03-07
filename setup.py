@@ -35,7 +35,7 @@ with open(path.join(here, "DESCRIPTION.rst")) as f:
 
 setup(
     name='texture',
-    version='0.1.0',
+    version='0.1.1',
 
     description='Micro-engine for creating text-based adventures',
     long_description=long_description,
@@ -46,6 +46,10 @@ setup(
     author_email='rafamedgar@gmail.com',
 
     license='MIT',
+
+    install_requires=[
+        'six==1.10.0',
+    ],
 
     classifiers=[
         'Development Status :: 4 - Beta',
