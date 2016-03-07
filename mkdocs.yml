@@ -1,0 +1,8 @@
+site_name: texture
+pages:
+    - Home: index.md
+    - Structure: structure.md
+    - Game Launcher: game_launcher.md
+    - Scenarios: scenarios.md
+    - Utilities: util.md
+theme: readthedocs
