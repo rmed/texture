@@ -35,7 +35,7 @@ with open(path.join(here, "DESCRIPTION.rst")) as f:
 
 setup(
     name='texture',
-    version='0.1.2',
+    version='0.1.3',
 
     description='Micro-engine for creating text-based adventures',
     long_description=long_description,

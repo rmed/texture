@@ -49,6 +49,7 @@ class LoaderUtil(object):
             raise TypeError('scenario name should be a string')
 
         self.scenario = scenario
+        return self
 
 
 class TickUtil(object):
