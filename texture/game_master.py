@@ -28,7 +28,7 @@
 from  . import util
 from six.moves import input
 import pkgutil
-import readline
+# import readline
 import six
 import sys
 
